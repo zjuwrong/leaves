@@ -13,7 +13,6 @@ import (
 const BatchSize = 16
 
 type ensembleBaseInterface interface {
-	FeatureNames() []string
 	NEstimators() int
 	NRawOutputGroups() int
 	NFeatures() int
@@ -27,8 +26,13 @@ type ensembleBaseInterface interface {
 
 // Ensemble is a common wrapper for all models
 type Ensemble struct {
+	featureNames []string
 	ensembleBaseInterface
 	transform transformation.Transform
+}
+
+func (e *Ensemble) FeatureNames() []string {
+	return e.featureNames
 }
 
 func (e *Ensemble) predictInnerAndTransform(fvals []float64, nEstimators int, predictions []float64, startIndex int) {
@@ -297,12 +301,12 @@ func (e *Ensemble) Transformation() transformation.Transform {
 // EnsembleWithRawPredictions returns ensemble instance with TransformRaw (no
 // transformation functions will be applied to the model resulst)
 func (e *Ensemble) EnsembleWithRawPredictions() *Ensemble {
-	return &Ensemble{e, &transformation.TransformRaw{e.NRawOutputGroups()}}
+	return &Ensemble{nil, e, &transformation.TransformRaw{e.NRawOutputGroups()}}
 }
 
 // EnsembleWithLeafPredictions returns ensemble instance with TransformLeafIndex
 // (return trees indices instead of numerical values)
 func (e *Ensemble) EnsembleWithLeafPredictions() *Ensemble {
 	// each predictions will produce NRawOutputGroups() * NEstimators() values
-	return &Ensemble{e, &transformation.TransformLeafIndex{e.NRawOutputGroups() * e.NEstimators()}}
+	return &Ensemble{nil, e, &transformation.TransformLeafIndex{e.NRawOutputGroups() * e.NEstimators()}}
 }

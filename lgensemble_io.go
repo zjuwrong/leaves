@@ -338,11 +338,11 @@ func LGEnsembleFromReader(reader *bufio.Reader, loadTransformation bool) (*Ensem
 	}
 	treeSizes := strings.Split(treeSizesStr, " ")
 
-	featureNames, isFound := params["feature_names"]
+	featureNamesStr, isFound := params["feature_names"]
 	if !isFound {
 		return nil, fmt.Errorf("no feature_names field")
 	}
-	e.featureNames = strings.Split(featureNames, " ")
+	featureNames := strings.Split(featureNamesStr, " ")
 
 	// NOTE: we rely on the fact that size of tree_sizes data is equal to number of trees
 	nTrees := len(treeSizes)
@@ -391,7 +391,7 @@ func LGEnsembleFromReader(reader *bufio.Reader, loadTransformation bool) (*Ensem
 		}
 		e.Trees = append(e.Trees, tree)
 	}
-	return &Ensemble{e, transform}, nil
+	return &Ensemble{featureNames, e, transform}, nil
 }
 
 // LGEnsembleFromFile reads LightGBM model from binary file
@@ -669,5 +669,5 @@ func LGEnsembleFromJSON(reader io.Reader, loadTransformation bool) (*Ensemble, e
 		}
 		e.Trees = append(e.Trees, tree)
 	}
-	return &Ensemble{e, &transformation.TransformRaw{e.nRawOutputGroups}}, nil
+	return &Ensemble{data.FeatureNames, e, &transformation.TransformRaw{e.nRawOutputGroups}}, nil
 }

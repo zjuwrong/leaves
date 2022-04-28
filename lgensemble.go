@@ -9,7 +9,6 @@ type lgEnsemble struct {
 	Trees            []lgTree
 	MaxFeatureIdx    int
 	nRawOutputGroups int
-	featureNames     []string
 	// lgEnsemble suits for different models from different packages (ex., LightGBM gbrt & sklearn gbrt)
 	// name contains the origin of the model
 	name string
@@ -17,10 +16,6 @@ type lgEnsemble struct {
 	// NOTE: LightGBM original implementation always divides result by NEstimators() if average_output set.
 	// `leaves` implementation divides result by nEstimators (adjusted number of trees used for prediction)
 	averageOutput bool
-}
-
-func (e *lgEnsemble) FeatureNames() []string {
-	return e.featureNames
 }
 
 func (e *lgEnsemble) NEstimators() int {
