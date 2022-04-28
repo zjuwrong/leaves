@@ -20,6 +20,7 @@ type lgEnsembleJSON struct {
 	NumTreesPerIteration int               `json:"num_tree_per_iteration"`
 	MaxFeatureIdx        int               `json:"max_feature_idx"`
 	Trees                []json.RawMessage `json:"tree_info"`
+	FeatureNames         []string          `json:"feature_names"`
 	// TODO: lightgbm should support the next fields
 	// AverageOutput bool   `json:"average_output"`
 	// Objective     string `json:"objective"`
@@ -336,6 +337,12 @@ func LGEnsembleFromReader(reader *bufio.Reader, loadTransformation bool) (*Ensem
 		return nil, fmt.Errorf("no tree_sizes field")
 	}
 	treeSizes := strings.Split(treeSizesStr, " ")
+
+	featureNames, isFound := params["feature_names"]
+	if !isFound {
+		return nil, fmt.Errorf("no feature_names field")
+	}
+	e.featureNames = strings.Split(featureNames, " ")
 
 	// NOTE: we rely on the fact that size of tree_sizes data is equal to number of trees
 	nTrees := len(treeSizes)
